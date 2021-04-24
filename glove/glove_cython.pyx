@@ -24,6 +24,7 @@ def fit_vectors(double[:, ::1] wordvec,
                 int[::1] row,
                 int[::1] col,
                 double[::1] counts,
+                double[::1] bias_counts,
                 int[::1] shuffle_indices,
                 double initial_learning_rate,
                 double max_count,
@@ -47,7 +48,7 @@ def fit_vectors(double[:, ::1] wordvec,
     # the cooccurrence count.
     cdef int word_a, word_b
     cdef double count, learning_rate, gradient
-
+    cdef double bias_count
     # Loss and gradient variables.
     cdef double prediction, entry_weight, loss
 
@@ -63,6 +64,7 @@ def fit_vectors(double[:, ::1] wordvec,
             word_a = row[shuffle_index]
             word_b = col[shuffle_index]
             count = counts[shuffle_index]
+            bias_count = bias_counts[shuffle_index]
 
             # Get prediction
             prediction = 0.0
@@ -74,7 +76,7 @@ def fit_vectors(double[:, ::1] wordvec,
 
             # Compute loss and the example weight.
             entry_weight = double_min(1.0, (count / max_count)) ** alpha
-            loss = entry_weight * (prediction - c_log(count))
+            loss = entry_weight * (prediction - c_log(count) - c_log(bias_count))
 
             # Clip the loss for numerical stability.
             if loss < -max_loss:

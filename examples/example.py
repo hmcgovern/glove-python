@@ -16,7 +16,7 @@ def read_corpus(filename):
 
     with open(filename, 'r') as datafile:
         for line in datafile:
-            yield line.lower().translate(None, delchars).split(' ')
+            yield line.lower().translate(str.maketrans('','', delchars)).split(' ')
 
 
 def read_wikipedia_corpus(filename):

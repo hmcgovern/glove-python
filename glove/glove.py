@@ -54,7 +54,7 @@ class Glove(object):
                           stability.
         - random_state: random statue used to intialize optimization
         """
-
+        print("IT'S A MIRACLE")
         self.no_components = no_components
         self.learning_rate = float(learning_rate)
         self.alpha = float(alpha)
@@ -71,8 +71,9 @@ class Glove(object):
         self.inverse_dictionary = None
 
         self.random_state = random_state
+        
 
-    def fit(self, matrix, epochs=5, no_threads=2, verbose=False):
+    def fit(self, matrix, bias_matrix, epochs=5, no_threads=2, verbose=False):
         """
         Estimate the word embeddings.
 
@@ -82,7 +83,7 @@ class Glove(object):
         - int no_threads: number of training threads
         - bool verbose: print progress messages if True
         """
-
+        
         shape = matrix.shape
 
         if (len(shape) != 2 or
@@ -91,6 +92,8 @@ class Glove(object):
 
         if not sp.isspmatrix_coo(matrix):
             raise Exception('Coocurrence matrix must be in the COO format')
+        if not sp.isspamatrix_coo(bias_matrix):
+            raise Exception('Coocurrence bias matrix must be in the COO format')
 
         random_state = check_random_state(self.random_state)
         self.word_vectors = ((random_state.rand(shape[0],
@@ -123,6 +126,7 @@ class Glove(object):
                         matrix.row,
                         matrix.col,
                         matrix.data,
+                        bias_matrix.data,
                         shuffle_indices,
                         self.learning_rate,
                         self.max_count,
